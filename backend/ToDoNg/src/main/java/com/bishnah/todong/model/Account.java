@@ -1,7 +1,6 @@
 package com.bishnah.todong.model;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -16,11 +15,12 @@ public class Account {
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Long id;
 
-    @NotNull
+
     @Column(unique = true)
     private String email;
 
-    @NotNull
-    @Column(name = "Password")
     private String password;
+
+    private String Authorities;
+
 }

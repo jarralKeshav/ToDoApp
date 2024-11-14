@@ -1,7 +1,24 @@
-import { Link, useLocation } from "react-router-dom";
+import {Link, useLocation, useNavigate} from "react-router-dom";
+import { useEffect, useState } from "react";
 
 const Navbar = () => {
     const location = useLocation();
+    const [isLoggedIn, setIsLoggedIn] = useState(false);
+    const navigate = useNavigate();
+
+
+    useEffect(() => {
+        // Check for token in localStorage
+        const token = localStorage.getItem('token');
+        setIsLoggedIn(!!token);  // Set to true if token exists
+    }, []);
+
+    const handleLogout = () => {
+        // Remove token from localStorage and update state
+        localStorage.removeItem('token');
+        setIsLoggedIn(false);
+        navigate('/login');
+    };
 
     return (
         <nav className="bg-white border-gray-200 dark:bg-gray-900">
@@ -56,9 +73,19 @@ const Navbar = () => {
                                 Contact
                             </Link>
                         </li>
-                        <li>
-                            <a href="/login" target="_blank" className="block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent">Login/Register</a>
-                        </li>
+                        {isLoggedIn ? (
+                            <li>
+                                <button onClick={handleLogout} className="block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent">
+                                    Logout
+                                </button>
+                            </li>
+                        ) : (
+                            <li>
+                                <Link to="/login" className="block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent">
+                                    Login/Register
+                                </Link>
+                            </li>
+                        )}
                     </ul>
                 </div>
             </div>

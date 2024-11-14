@@ -4,6 +4,7 @@ package com.bishnah.todong.controller;
 import com.bishnah.todong.payload.account.TokenDTO;
 import com.bishnah.todong.payload.account.UserLoginDTO;
 import com.bishnah.todong.service.TokenService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @CrossOrigin(origins = "http://localhost:5173", maxAge = 3600)
 @RequestMapping("/api/v1/auth")
+@Tag(name = "Auth Controller", description = "Controller for Account Management")
 public class AuthController {
 
     private final AuthenticationManager authenticationManager;

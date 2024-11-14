@@ -1,18 +1,60 @@
-// ================================|| LOGIN ||================================ //
-
-// const Login = () => (<div>Login page</div>);
-//
-// export default Login;
-import  { useState } from 'react';
+import {useEffect, useState} from 'react';
+import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 
 function Login() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [error, setError] = useState({ email: '', password: '' });
+    const [loginError, setLoginError] = useState('');
+    const navigate = useNavigate();
 
-    const handleSubmit = (e) => {
+    useEffect(() => {
+        const isLoggedIn = localStorage.getItem('token');
+        if(isLoggedIn) {
+            navigate('/');
+            window.location.reload();
+        }
+    },[navigate]);
+
+    const validateEmail = () => {
+        const emailRegex = /^[a-z0-9]+@[a-z]+\.[a-z]{2,3}$/;
+        return emailRegex.test(email);
+    };
+
+    const validatePassword = () => {
+        return password.length >= 6 && password.length <= 16;
+    };
+
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        // Handle login logic here, such as sending a request to the API
-        console.log('Logging in with:', { email, password });
+
+        setError({ email: '', password: '' });  // Reset error messages
+
+        if (!validateEmail()) {
+            setError((prevErrors) => ({ ...prevErrors, email: 'Invalid email format' }));
+            return;
+        }
+
+        if (!validatePassword()) {
+            setError((prevErrors) => ({ ...prevErrors, password: 'Password must be between 6 and 16 characters' }));
+            return;
+        }
+
+        const payload = { email, password };
+
+        try {
+            const response = await axios.post('http://localhost:8080/api/v1/auth/token', payload);
+            if (response.data.token) {  // Assuming the token is in response.data.token
+                localStorage.setItem('token', response.data.token);  // Store token in localStorage
+                navigate('/');  // Redirect upon successful login
+            } else {
+                setLoginError('Invalid credentials. Please try again.');
+            }
+        } catch (error) {
+            console.error('Error during login:', error.message);
+            setLoginError('An error occurred. Please try again later.');
+        }
     };
 
     return (
@@ -23,10 +65,7 @@ function Login() {
             >
                 <h2 className="text-2xl font-semibold text-center mb-6 text-white">Login</h2>
                 <div className="mb-4">
-                    <label
-                        className="block text-gray-300 text-sm font-bold mb-2"
-                        htmlFor="email"
-                    >
+                    <label className="block text-gray-300 text-sm font-bold mb-2" htmlFor="email">
                         Email
                     </label>
                     <input
@@ -37,12 +76,10 @@ function Login() {
                         required
                         className="w-full px-3 py-2 bg-gray-700 text-gray-200 border border-gray-600 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
+                    {error.email && <p className="text-red-500 text-xs mt-2">{error.email}</p>}
                 </div>
                 <div className="mb-6">
-                    <label
-                        className="block text-gray-300 text-sm font-bold mb-2"
-                        htmlFor="password"
-                    >
+                    <label className="block text-gray-300 text-sm font-bold mb-2" htmlFor="password">
                         Password
                     </label>
                     <input
@@ -53,7 +90,9 @@ function Login() {
                         required
                         className="w-full px-3 py-2 bg-gray-700 text-gray-200 border border-gray-600 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
+                    {error.password && <p className="text-red-500 text-xs mt-2">{error.password}</p>}
                 </div>
+                {loginError && <p className="text-red-500 text-sm mb-4">{loginError}</p>}
                 <button
                     type="submit"
                     className="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"

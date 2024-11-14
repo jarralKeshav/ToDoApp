@@ -23,15 +23,19 @@ public class Todo {
     @Column(name = "Description")
     private String description;
 
-    private boolean completed;
+//    private boolean completed;
+//
+//    @Column(updatable = false)
+//    private LocalDateTime createdAt;
+//
+//    @PrePersist
+//    protected void onCreate(){
+//        this.createdAt = LocalDateTime.now();
+//    }
 
-    @Column(updatable = false)
-    private LocalDateTime createdAt;
-
-    @PrePersist
-    protected void onCreate(){
-        this.createdAt = LocalDateTime.now();
-    }
+    @ManyToOne
+    @JoinColumn(name = "account_id", referencedColumnName ="id", nullable = false)
+    private Account account;
 
 
 }

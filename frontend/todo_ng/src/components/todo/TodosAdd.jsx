@@ -1,33 +1,62 @@
 import { useState } from "react";
-import axios from "axios";
+import fetchPostDataWithAuth from "../../client.js"; // Assuming this is the path to your fetch function
+import { useNavigate } from "react-router-dom";
 
-export function TodosAdd({onAddTodo}) {
-    const [title, setTitle] = useState("");
-    const [description, setDescription] = useState("");
+export function TodosAdd() {
+    const navigate = useNavigate();
+
+    const [formData, setFormData] = useState({
+        title: '',
+        description: ''
+    });
+
+    const [errors, setErrors] = useState({
+        title: '',
+        description: ''
+    });
+
+    const handleInputChange = (e) => {
+        const { name, value } = e.target;
+        setFormData((prevData) => ({
+            ...prevData,
+            [name]: value
+        }));
+    };
 
     const handleSubmit = async (e) => {
-        e.preventDefault(); // Prevent the default form submission behavior
+        e.preventDefault();
 
-        try {
-            const response = await axios.post("http://localhost:8080/api/v1/todos/add", {
-                title,
-                description,
-            });
-            console.log("Todo added successfully:", response.data);
+        let isValid = true;
+        const newErrors = { title: '', description: '' };
 
-            // Call the onAddTodo function passed as a prop to update the parent component's state
-            if (onAddTodo) {
-                onAddTodo(response.data); // Pass the newly added todo data
+        // Validation checks
+        if (!formData.title.trim()) {
+            newErrors.title = 'Title is required';
+            isValid = false;
+        }
 
+        if (!formData.description.trim()) {
+            newErrors.description = 'Description is required';
+            isValid = false;
+        }
+
+        setErrors(newErrors);
+
+        if (isValid) {
+            const payload = {
+                title: formData.title,
+                description: formData.description
+            };
+
+            try {
+                const response = await fetchPostDataWithAuth('/todos/add', payload);
+                console.log('Todo added:', response.data);
+
+                // Optionally navigate after submission or show a success message
+                navigate('/');  // Redirect to the home page after submitting
+            } catch (error) {
+                console.error('Error submitting todo:', error.message);
             }
-
-            // Clear the input fields
-            setTitle("");
-            setDescription("");
-            // window.location.reload();
-        } catch (error) {
-            console.error("Error adding data:", error.message);
-            // Optionally show an error message to the user here
         }
     };
 
@@ -41,25 +70,29 @@ export function TodosAdd({onAddTodo}) {
                     <label className="block text-gray-700 dark:text-gray-300 font-medium mb-2">Title</label>
                     <input
                         type="text"
-                        value={title}
-                        onChange={(e) => setTitle(e.target.value)}
+                        name="title"
+                        value={formData.title}
+                        onChange={handleInputChange}
                         className="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
                         placeholder="Enter the title"
                         required
                     />
+                    {errors.title && <p className="text-red-500 text-sm mt-2">{errors.title}</p>}
                 </div>
 
                 {/* Description Input */}
                 <div className="mb-6">
                     <label className="block text-gray-700 dark:text-gray-300 font-medium mb-2">Description</label>
                     <textarea
-                        value={description}
-                        onChange={(e) => setDescription(e.target.value)}
+                        name="description"
+                        value={formData.description}
+                        onChange={handleInputChange}
                         className="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
                         placeholder="Enter the description"
                         rows="4"
                         required
                     ></textarea>
+                    {errors.description && <p className="text-red-500 text-sm mt-2">{errors.description}</p>}
                 </div>
 
                 {/* Submit Button */}

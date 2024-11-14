@@ -10,8 +10,12 @@ import java.util.Optional;
 
 @Service
 public class TodoService {
-    @Autowired
+    final
     TodoRepository todoRepository;
+
+    public TodoService(TodoRepository todoRepository) {
+        this.todoRepository = todoRepository;
+    }
 
     public Todo createTodo(Todo todo){
         return todoRepository.save(todo);

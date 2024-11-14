@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { Button } from "@material-tailwind/react";
-import {TodosAdd} from "./TodosAdd.jsx";
 import Navbar from "../navbar/Navbar.jsx";
+import {TodosAdd} from "./TodosAdd.jsx";
 
 export function TodosCard() {
     const urlFetch = "http://localhost:8080/api/v1/todos";
@@ -56,7 +56,7 @@ export function TodosCard() {
         <>
             <Navbar/>
             <TodosAdd  onAddTodo={handleAddTodo}/>
-            <div className="grid gap-4 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 text-sm ">
+            <div className="grid gap-4 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 text-sm">
                 {dataArray.length > 0 ? (
                     dataArray.map((data, index) => (
                         <div

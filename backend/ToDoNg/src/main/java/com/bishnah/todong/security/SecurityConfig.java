@@ -9,7 +9,6 @@ import com.nimbusds.jose.proc.SecurityContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.Customizer;
@@ -70,26 +69,24 @@ public class SecurityConfig {
     }
 
 
-
-
-
-
-
-
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
-        http.authorizeHttpRequests(authorize -> authorize
-                .requestMatchers("api/v1/auth/token").permitAll()
+        http.authorizeHttpRequests(authorize -> authorize.requestMatchers("api/v1/auth/token").permitAll()
+                .requestMatchers("/home").authenticated()
+
+                .requestMatchers("/swagger-ui/**").permitAll()
+                .requestMatchers("/v3/api-docs/**").permitAll()
 
 
-                .requestMatchers("/api/v1").permitAll().requestMatchers("/api" +
-                "/v1/todos/add").permitAll().requestMatchers("/api/v1/todos").permitAll().requestMatchers("/api/v1" +
-                "/todos/add").permitAll().requestMatchers("/api/v1/todos/{todo_id}/delete").permitAll()).oauth2ResourceServer(oauth2 -> oauth2.jwt(Customizer.withDefaults())).sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+                .requestMatchers("/api/v1").permitAll()
+                .requestMatchers("/api/v1/todos/add").permitAll()
+                .requestMatchers("/api/v1/todos").permitAll()
+                .requestMatchers("/api/v1/todos/{todo_id}/delete").permitAll()).oauth2ResourceServer(oauth2 -> oauth2.jwt(Customizer.withDefaults())).sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
         http.httpBasic(AbstractHttpConfigurer::disable);
         http.csrf(AbstractHttpConfigurer::disable);
-        http.headers(header->header.frameOptions(HeadersConfigurer.FrameOptionsConfig::disable));
+        http.headers(header -> header.frameOptions(HeadersConfigurer.FrameOptionsConfig::disable));
 
 
         return http.build();
